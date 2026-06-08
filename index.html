@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MikroTik Lab PRO — Simulador Educacional</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #0d0d12;
+  --bg2: #13131c;
+  --bg3: #1a1a28;
+  --panel: #161622;
+  --border: #2a2a42;
+  --border2: #3a3a5a;
+  --accent: #4a6fff;
+  --accent2: #00d4ff;
+  --green: #00ff88;
+  --yellow: #ffcc00;
+  --red: #ff4455;
+  --text: #c8c8e8;
+  --text2: #7878a8;
+  --text3: #4a4a6a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #0d0d12 0%, #0d1230 50%, #0d0d12 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 32px 24px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 300px;
+  background: radial-gradient(ellipse, rgba(74,111,255,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: var(--accent2);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+.hero-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(22px, 4vw, 38px);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 2px;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.hero-title span { color: var(--accent); }
+
+.hero-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--text2);
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+.hero-badges {
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px;
+}
+
+.hb {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+}
+.hb-blue  { background: rgba(74,111,255,0.15); border: 1px solid rgba(74,111,255,0.4); color: #8aadff; }
+.hb-green { background: rgba(0,255,136,0.1);   border: 1px solid rgba(0,255,136,0.3);  color: #00ff88; }
+.hb-cyan  { background: rgba(0,212,255,0.1);   border: 1px solid rgba(0,212,255,0.3);  color: #00d4ff; }
+
+/* ── WINBOX SHELL ── */
+.wb-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px;
+}
+
+.wb {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  box-shadow: 0 0 40px rgba(74,111,255,0.08), 0 8px 32px rgba(0,0,0,0.6);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+}
+
+.wb-tbar {
+  background: linear-gradient(to bottom, #2a2a4a, #1a1a32);
+  padding: 4px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border2);
+  user-select: none;
+}
+
+.wb-tbar-t { color: #fff; font-size: 11px; font-family: 'Share Tech Mono', monospace; }
+.wb-tbar-r { display: flex; gap: 5px; align-items: center; }
+.wb-tbar-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
+.dot-red    { background: #ff5f57; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green  { background: #28ca41; }
+
+.wb-mbar {
+  background: #1e1e30;
+  padding: 2px 8px;
+  display: flex; gap: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.wb-mi { color: #9898b8; font-size: 11px; cursor: pointer; padding: 2px 4px; }
+.wb-mi:hover { background: rgba(74,111,255,0.2); color: #fff; }
+
+.wb-toolbar {
+  background: #1a1a2a;
+  padding: 4px 8px;
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+
+.tbb {
+  background: #252538;
+  border: 1px solid #3a3a58;
+  color: #9898c8;
+  font-size: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  padding: 3px 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.5px;
+}
+.tbb:hover { background: rgba(74,111,255,0.2); border-color: var(--accent); color: #fff; }
+.tbb.act   { background: rgba(74,111,255,0.25); border-color: var(--accent); color: #aaccff; }
+
+.wb-layout {
+  display: flex;
+  height: 560px;
+}
+
+/* ── SIDEBAR ── */
+.wb-sb {
+  width: 172px;
+  background: #111120;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.wb-sb::-webkit-scrollbar { width: 4px; }
+.wb-sb::-webkit-scrollbar-track { background: #0d0d18; }
+.wb-sb::-webkit-scrollbar-thumb { background: var(--border2); }
+
+.sb-sec {
+  background: #0d0d1a;
+  color: #4a4a7a;
+  font-size: 9px;
+  padding: 5px 10px 3px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #1a1a2a;
+}
+
+.sb-item {
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  border-bottom: 1px solid #1a1a28;
+  color: #8888b8;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.12s;
+}
+.sb-item:hover { background: rgba(74,111,255,0.12); color: #c8c8f8; }
+.sb-item.act   { background: rgba(74,111,255,0.22); color: #aaccff; border-left: 2px solid var(--accent); }
+
+/* ── CONTENT ── */
+.wb-cnt {
+  flex: 1; overflow: hidden; display: flex; flex-direction: column;
+}
+
+.pnl { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.pnl.act { display: flex; }
+
+.ph {
+  background: linear-gradient(to right, #1e1e38, #1a1a2a);
+  padding: 5px 12px;
+  font-size: 11px;
+  color: #8888ff;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+
+.pc {
+  overflow-y: auto; flex: 1; padding: 8px;
+}
+.pc::-webkit-scrollbar { width: 5px; }
+.pc::-webkit-scrollbar-track { background: #0d0d18; }
+.pc::-webkit-scrollbar-thumb { background: #3a3a5a; }
+
+/* ── TABLE ── */
+.wbt { width: 100%; border-collapse: collapse; font-size: 11px; }
+.wbt th {
+  background: #1a1a32; color: #6666aa;
+  padding: 4px 8px; text-align: left;
+  border-bottom: 1px solid var(--border2);
+  font-weight: normal; letter-spacing: 0.5px;
+}
+.wbt td { padding: 3px 8px; border-bottom: 1px solid #1d1d2d; }
+.wbt tr:hover td { background: rgba(74,111,255,0.08); }
+.wbt tr.sel td   { background: rgba(74,111,255,0.15); }
+
+/* ── BADGES ── */
+.bk { display: inline-block; padding: 1px 7px; font-size: 9px; font-family: 'Share Tech Mono', monospace; }
+.bok  { background: rgba(0,255,136,0.1);  color: #00cc66; border: 1px solid rgba(0,255,136,0.25); }
+.bwn  { background: rgba(255,204,0,0.1);  color: #ccaa00; border: 1px solid rgba(255,204,0,0.25); }
+.ber  { background: rgba(255,68,85,0.1);  color: #ff4455; border: 1px solid rgba(255,68,85,0.25); }
+.bbl  { background: rgba(0,212,255,0.1);  color: #00aacc; border: 1px solid rgba(0,212,255,0.25); }
+
+/* ── LESSON / TIP / WARN ── */
+.lb {
+  background: rgba(74,111,255,0.05);
+  border: 1px solid rgba(74,111,255,0.2);
+  border-left: 3px solid var(--accent);
+  padding: 8px 10px; margin-bottom: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; color: #9898cc; line-height: 1.6;
+}
+.lb h4 { color: #8888ff; margin-bottom: 5px; font-size: 12px; font-family: 'Share Tech Mono', monospace; }
+.lb code { color: #ffaa44; background: rgba(255,170,68,0.08); padding: 1px 5px; font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+
+.tb2 {
+  background: rgba(0,255,136,0.04);
+  border: 1px solid rgba(0,255,136,0.15);
+  border-left: 3px solid var(--green);
+  padding: 7px 10px; margin-bottom: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; color: #66cc88;
+}
+.tb2 code { color: #ffaa44; font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+
+.wb2 {
+  background: rgba(255,170,0,0.04);
+  border: 1px solid rgba(255,170,0,0.2);
+  border-left: 3px solid var(--yellow);
+  padding: 7px 10px; margin-bottom: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; color: #ccaa55;
+}
+.wb2 code { color: #ffaa44; font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+
+/* ── BUTTONS ── */
+.btn-a { background: rgba(0,180,80,0.15);  border: 1px solid rgba(0,200,80,0.3);  color: #00cc66; font-size: 10px; font-family: 'Share Tech Mono', monospace; padding: 3px 10px; cursor: pointer; margin: 2px; }
+.btn-r { background: rgba(200,40,60,0.15); border: 1px solid rgba(220,60,80,0.3); color: #ff4455; font-size: 10px; font-family: 'Share Tech Mono', monospace; padding: 3px 10px; cursor: pointer; margin: 2px; }
+.btn-p { background: rgba(74,111,255,0.15);border: 1px solid rgba(74,111,255,0.3);color: #6688ff; font-size: 10px; font-family: 'Share Tech Mono', monospace; padding: 3px 10px; cursor: pointer; margin: 2px; }
+.btn-a:hover { background: rgba(0,200,80,0.25); }
+.btn-r:hover { background: rgba(220,60,80,0.25); }
+.btn-p:hover { background: rgba(74,111,255,0.3); }
+
+/* ── PROGRESS ── */
+.pb { background: #0d0d1a; border: 1px solid var(--border); height: 6px; overflow: hidden; margin: 3px 0; }
+.pf { background: linear-gradient(to right, var(--accent), var(--accent2)); height: 100%; transition: width 0.4s ease; }
+
+/* ── STATUS BAR ── */
+.stbar {
+  background: #0d0d18;
+  border-top: 1px solid var(--border);
+  padding: 3px 10px;
+  font-size: 10px; color: #4a4a6a;
+  display: flex; gap: 16px;
+  flex-shrink: 0;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* ── TERMINAL ── */
+.term {
+  background: #050508;
+  color: #00cc66;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  padding: 10px;
+  overflow-y: auto;
+  flex: 1;
+  line-height: 1.5;
+}
+.term::-webkit-scrollbar { width: 4px; }
+.term::-webkit-scrollbar-thumb { background: #1a1a2a; }
+.term .pr  { color: #4a8fff; }
+.term .ok  { color: #00cc66; }
+.term .er  { color: #ff4455; }
+.term .inf { color: #ffaa00; }
+.term .cm  { color: #5a5a7a; }
+
+.ti-row {
+  display: flex; align-items: center;
+  background: #050508;
+  padding: 4px 10px;
+  border-top: 1px solid #1a1a2a;
+  flex-shrink: 0;
+}
+.ti {
+  background: transparent; border: none;
+  color: #00cc66;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; flex: 1; outline: none;
+}
+.ti-hints {
+  background: #080810;
+  padding: 4px 10px;
+  border-top: 1px solid #111120;
+  font-size: 10px; color: #2a2a4a;
+  font-family: 'Share Tech Mono', monospace;
+  flex-shrink: 0;
+  line-height: 1.6;
+}
+
+/* ── QUIZ ── */
+.qb {
+  background: rgba(120,60,160,0.06);
+  border: 1px solid rgba(120,60,200,0.2);
+  padding: 10px; margin-bottom: 8px;
+}
+.qb h4 { color: #aa66ff; margin-bottom: 7px; font-size: 11px; font-family: 'Share Tech Mono', monospace; line-height: 1.5; }
+.qo {
+  background: rgba(80,40,100,0.2);
+  border: 1px solid rgba(100,60,140,0.3);
+  color: #9898b8; font-size: 11px; font-family: 'Rajdhani', sans-serif;
+  padding: 5px 10px; cursor: pointer;
+  display: block; width: 100%; text-align: left; margin-bottom: 3px;
+  transition: all 0.12s;
+}
+.qo:hover:not(:disabled) { background: rgba(100,60,160,0.3); color: #c8c8f8; border-color: #7744aa; }
+.qo.qok { background: rgba(0,180,80,0.15); border-color: rgba(0,200,80,0.4); color: #00cc66; }
+.qo.qer { background: rgba(200,40,60,0.15); border-color: rgba(220,60,80,0.4); color: #ff4455; }
+
+/* ── DASHBOARD CARDS ── */
+.dash-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 10px; }
+.dash-card {
+  padding: 8px; text-align: center;
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+.dash-val { font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 700; }
+.dash-lbl { font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-top: 2px; }
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  padding: 16px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+}
+.footer a { color: var(--accent); text-decoration: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .wb-sb { width: 130px; }
+  .sb-item { font-size: 10px; padding: 4px 6px; }
+  .dash-grid { grid-template-columns: repeat(2,1fr); }
+  .wb-toolbar { gap: 2px; }
+  .tbb { padding: 3px 5px; font-size: 9px; }
+}
+@media (max-width: 520px) {
+  .wb-sb { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-logo">Simulador Educacional</div>
+  <div class="hero-title">MikroTik <span>Lab</span> PRO</div>
+  <div class="hero-sub">// AMBIENTE WINBOX INTERATIVO — ROUTEROS 7.x //</div>
+  <div class="hero-badges">
+    <span class="hb hb-blue">VLAN</span>
+    <span class="hb hb-blue">PPPoE</span>
+    <span class="hb hb-blue">BRIDGE</span>
+    <span class="hb hb-green">FIREWALL</span>
+    <span class="hb hb-green">DHCP</span>
+    <span class="hb hb-cyan">VPN L2TP/IPSec</span>
+    <span class="hb hb-cyan">QoS</span>
+    <span class="hb hb-blue">TERMINAL CLI</span>
+    <span class="hb hb-green">QUIZ PRO</span>
+  </div>
+</div>
+
+<!-- WINBOX -->
+<div class="wb-shell">
+<div class="wb">
+
+  <!-- TITLEBAR -->
+  <div class="wb-tbar">
+    <span class="wb-tbar-t">MikroTik Winbox Lab PRO — 192.168.88.1 — [admin]</span>
+    <div class="wb-tbar-r">
+      <span style="color:#00cc66;font-size:10px;margin-right:8px;">● RouterOS 7.14 | hEX S</span>
+      <div class="wb-tbar-dot dot-red"></div>
+      <div class="wb-tbar-dot dot-yellow"></div>
+      <div class="wb-tbar-dot dot-green"></div>
+    </div>
+  </div>
+
+  <!-- MENUBAR -->
+  <div class="wb-mbar">
+    <span class="wb-mi">File</span>
+    <span class="wb-mi">View</span>
+    <span class="wb-mi">Tools</span>
+    <span class="wb-mi">Help</span>
+    <span style="margin-left:auto;color:#2a2a4a;font-size:10px;">MikroTik Lab PRO v2.0 — Educacional</span>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="wb-toolbar">
+    <button class="tbb act" onclick="sp('dash');setTb(this)">Dashboard</button>
+    <button class="tbb" onclick="sp('iface');setTb(this)">Interfaces</button>
+    <button class="tbb" onclick="sp('bridge');setTb(this)">Bridge</button>
+    <button class="tbb" onclick="sp('vlan');setTb(this)">VLAN</button>
+    <button class="tbb" onclick="sp('wifi');setTb(this)">Wireless</button>
+    <button class="tbb" onclick="sp('pppoe');setTb(this)">PPPoE</button>
+    <button class="tbb" onclick="sp('dhcp');setTb(this)">DHCP</button>
+    <button class="tbb" onclick="sp('fw');setTb(this)">Firewall</button>
+    <button class="tbb" onclick="sp('vpn');setTb(this)">VPN</button>
+    <button class="tbb" onclick="sp('qos');setTb(this)">QoS</button>
+    <button class="tbb" onclick="sp('sec');setTb(this)">Seguranca</button>
+    <button class="tbb" onclick="sp('term');setTb(this)">Terminal</button>
+    <button class="tbb" onclick="sp('quiz');setTb(this)">Quiz</button>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="wb-layout">
+
+    <!-- SIDEBAR -->
+    <div class="wb-sb">
+      <div class="sb-sec">Sistema</div>
+      <div class="sb-item act" onclick="sp('dash');setNi(this)">📊 Dashboard</div>
+      <div class="sb-sec">Interfaces</div>
+      <div class="sb-item" onclick="sp('iface');setNi(this)">🔌 Interface List</div>
+      <div class="sb-item" onclick="sp('bridge');setNi(this)">🌉 Bridge</div>
+      <div class="sb-item" onclick="sp('vlan');setNi(this)">🏷️ VLAN</div>
+      <div class="sb-item" onclick="sp('wifi');setNi(this)">📡 Wireless</div>
+      <div class="sb-sec">IP</div>
+      <div class="sb-item" onclick="sp('dhcp');setNi(this)">📋 DHCP Server</div>
+      <div class="sb-item" onclick="sp('pppoe');setNi(this)">🔗 PPPoE</div>
+      <div class="sb-item" onclick="sp('fw');setNi(this)">🛡️ Firewall/NAT</div>
+      <div class="sb-sec">Avancado</div>
+      <div class="sb-item" onclick="sp('vpn');setNi(this)">🔐 VPN L2TP</div>
+      <div class="sb-item" onclick="sp('qos');setNi(this)">⚡ QoS / Filas</div>
+      <div class="sb-sec">Ferramentas</div>
+      <div class="sb-item" onclick="sp('sec');setNi(this)">🔒 Seguranca</div>
+      <div class="sb-item" onclick="sp('term');setNi(this)">💻 Terminal</div>
+      <div class="sb-item" onclick="sp('quiz');setNi(this)">🎯 Quiz PRO</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="wb-cnt" id="wb-cnt">
+
+      <!-- DASHBOARD -->
+      <div class="pnl act" id="pnl-dash">
+        <div class="ph">📊 Dashboard — MikroTik Lab PRO</div>
+        <div class="pc">
+          <div class="dash-grid">
+            <div class="dash-card"><div class="dash-val" style="color:#6688ff;">11</div><div class="dash-lbl">MODULOS</div></div>
+            <div class="dash-card"><div class="dash-val" style="color:#00cc66;" id="d-score">0</div><div class="dash-lbl">PONTOS</div></div>
+            <div class="dash-card"><div class="dash-val" style="color:#ffaa44;" id="d-ans">0</div><div class="dash-lbl">RESPOSTAS</div></div>
+            <div class="dash-card"><div class="dash-val" style="color:#aa66ff;">12</div><div class="dash-lbl">PERGUNTAS</div></div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div style="color:#4a4a6a;font-size:10px;margin-bottom:3px;font-family:'Share Tech Mono',monospace;">PROGRESSO GERAL</div>
+            <div class="pb"><div class="pf" id="d-prog" style="width:0%"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+            <div style="background:#0d0d1a;border:1px solid var(--border);padding:8px;">
+              <div style="color:#4a4a8a;font-size:9px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;margin-bottom:6px;">IDENTIDADE DO ROUTER</div>
+              <table style="font-size:11px;width:100%;color:#4a4a6a;font-family:'Share Tech Mono',monospace;">
+                <tr><td style="padding:1px 0;">Nome:</td><td style="color:#9898c8;">MikroTik-Lab</td></tr>
+                <tr><td>Modelo:</td><td style="color:#9898c8;">hEX S (RB760iGS)</td></tr>
+                <tr><td>RouterOS:</td><td style="color:#00cc66;">7.14.2 (stable)</td></tr>
+                <tr><td>Uptime:</td><td style="color:#00cc66;">5d 08:22:14</td></tr>
+                <tr><td>CPU:</td><td style="color:#9898c8;">MIPS 880MHz</td></tr>
+              </table>
+            </div>
+            <div style="background:#0d0d1a;border:1px solid var(--border);padding:8px;">
+              <div style="color:#4a4a8a;font-size:9px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;margin-bottom:6px;">RECURSOS DO SISTEMA</div>
+              <div style="font-size:10px;color:#4a4a6a;margin-bottom:2px;">CPU  18%</div>
+              <div class="pb"><div class="pf" style="width:18%;background:linear-gradient(to right,#00aa44,#00ff88);"></div></div>
+              <div style="font-size:10px;color:#4a4a6a;margin:5px 0 2px;">RAM  44%</div>
+              <div class="pb"><div class="pf" style="width:44%;background:linear-gradient(to right,#aaaa00,#ffcc00);"></div></div>
+              <div style="font-size:10px;color:#4a4a6a;margin:5px 0 2px;">HDD  62%</div>
+              <div class="pb"><div class="pf" style="width:62%;background:linear-gradient(to right,#aa4400,#ff8800);"></div></div>
+            </div>
+          </div>
+          <div class="lb"><h4>🗺️ ROTEIRO DE APRENDIZADO</h4>1. Interface List → 2. Bridge → 3. VLAN → 4. Wireless → 5. PPPoE → 6. DHCP → 7. Firewall/NAT → 8. VPN → 9. QoS → 10. Seguranca → 11. Terminal CLI → 12. Quiz PRO</div>
+          <div class="tb2">💡 Use o módulo <strong>Terminal</strong> para praticar comandos reais do RouterOS com feedback interativo! Seta ↑ para histórico.</div>
+        </div>
+      </div>
+
+      <!-- INTERFACES -->
+      <div class="pnl" id="pnl-iface">
+        <div class="ph">🔌 Interface List</div>
+        <div class="pc">
+          <div class="lb"><h4>📘 INTERFACES NO MIKROTIK</h4>Cada porta fisica ou virtual e uma interface. <code>ether1</code> = WAN (provedor). <code>ether2-5</code> = LAN. <code>wlan1</code> = Wi-Fi. Nunca adicione ether1 ao bridge da LAN!</div>
+          <div style="margin-bottom:6px;"><button class="btn-a">+ Add</button><button class="btn-r">- Remove</button><button class="btn-p">Enable</button><button class="btn-p">Disable</button></div>
+          <table class="wbt">
+            <tr><th>Nome</th><th>Tipo</th><th>MAC Address</th><th>MTU</th><th>Status</th><th>TX / RX</th></tr>
+            <tr class="sel"><td>ether1</td><td>ether</td><td>D4:CA:6D:11:22:33</td><td>1500</td><td><span class="bk bok">running</span></td><td>12.4M / 98.2M</td></tr>
+            <tr><td>ether2</td><td>ether</td><td>D4:CA:6D:11:22:34</td><td>1500</td><td><span class="bk bok">running</span></td><td>1.2M / 4.5M</td></tr>
+            <tr><td>ether3</td><td>ether</td><td>D4:CA:6D:11:22:35</td><td>1500</td><td><span class="bk bwn">no link</span></td><td>0 / 0</td></tr>
+            <tr><td>ether4</td><td>ether</td><td>D4:CA:6D:11:22:36</td><td>1500</td><td><span class="bk bwn">no link</span></td><td>0 / 0</td></tr>
+            <tr><td>ether5-sfp</td><td>ether</td><td>D4:CA:6D:11:22:37</td><td>1500</td><td><span class="bk bwn">no link</span></td><td>0 / 0</td></tr>
+            <tr><td>wlan1</td><td>wlan</td><td>D4:CA:6D:11:22:38</td><td>1500</td><td><span class="bk bok">running</span></td><td>0.8M / 2.1M</td></tr>
+            <tr><td>bridge1</td><td>bridge</td><td>D4:CA:6D:11:22:34</td><td>1500</td><td><span class="bk bok">running</span></td><td>—</td></tr>
+            <tr><td>pppoe-out1</td><td>pppoe-out</td><td>—</td><td>1480</td><td><span class="bk bok">running</span></td><td>8.1M / 42.3M</td></tr>
+            <tr><td>vlan10</td><td>vlan</td><td>—</td><td>1500</td><td><span class="bk bok">running</span></td><td>0.2M / 0.8M</td></tr>
+            <tr><td>l2tp-vpn1</td><td>l2tp-in</td><td>—</td><td>1500</td><td><span class="bk bbl">waiting</span></td><td>0 / 0</td></tr>
+          </table>
+          <div class="tb2" style="margin-top:8px;">💡 Comando: <code>interface print</code> (no Terminal)</div>
+        </div>
+      </div>
+
+      <!-- BRIDGE -->
+      <div class="pnl" id="pnl-bridge">
+        <div class="ph">🌉 Bridge — Switch Virtual</div>
+        <div class="pc">
+          <div class="lb"><h4>📘 O QUE E BRIDGE?</h4>Bridge une interfaces como um switch virtual. Portas LAN (<code>ether2-4</code>) e <code>wlan1</code> entram na bridge. O IP do router vai na bridge, nao nas portas individuais.<br><br><code>/interface bridge add name=bridge1</code><br><code>/interface bridge port add bridge=bridge1 interface=ether2</code></div>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin-bottom:4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">BRIDGES</div>
+          <table class="wbt">
+            <tr><th>Nome</th><th>MTU</th><th>STP</th><th>VLAN Filter</th><th>Fast Forward</th><th>Status</th></tr>
+            <tr class="sel"><td>bridge1</td><td>1500</td><td>no</td><td>yes</td><td>yes</td><td><span class="bk bok">running</span></td></tr>
+          </table>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin:8px 0 4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">BRIDGE PORTS</div>
+          <table class="wbt">
+            <tr><th>Interface</th><th>Bridge</th><th>PVID</th><th>Role</th><th>Status</th></tr>
+            <tr><td>ether2</td><td>bridge1</td><td>1</td><td>designated</td><td><span class="bk bok">active</span></td></tr>
+            <tr><td>ether3</td><td>bridge1</td><td>1</td><td>designated</td><td><span class="bk bwn">inactive</span></td></tr>
+            <tr><td>ether4</td><td>bridge1</td><td>1</td><td>designated</td><td><span class="bk bwn">inactive</span></td></tr>
+            <tr><td>wlan1</td><td>bridge1</td><td>1</td><td>designated</td><td><span class="bk bok">active</span></td></tr>
+          </table>
+          <div class="wb2" style="margin-top:8px;">⚠️ Com <code>vlan-filtering=yes</code> ativo na bridge, as portas passam a respeitar as regras de VLAN — necessario para isolamento de redes.</div>
+        </div>
+      </div>
+
+      <!-- VLAN -->
+      <div class="pnl" id="pnl-vlan">
+        <div class="ph">🏷️ VLAN — Segmentacao de Redes</div>
+        <div class="pc">
+          <div class="lb"><h4>📘 O QUE SAO VLANs?</h4>VLANs isolam segmentos numa mesma infraestrutura fisica. Ex: VLAN10 = Funcionarios, VLAN20 = Cameras, VLAN30 = Visitantes. Cada VLAN tem seu proprio IP, DHCP e firewall controlando o acesso entre elas.<br><br><code>/interface vlan add name=vlan10 vlan-id=10 interface=bridge1</code><br><code>/ip address add address=10.10.10.1/24 interface=vlan10</code><br><code>/interface bridge vlan add bridge=bridge1 vlan-ids=10 tagged=ether2 untagged=ether3</code></div>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin-bottom:4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">BRIDGE VLAN TABLE</div>
+          <table class="wbt">
+            <tr><th>Bridge</th><th>VLAN IDs</th><th>Tagged (trunk)</th><th>Untagged (access)</th></tr>
+            <tr class="sel"><td>bridge1</td><td>10</td><td>ether2</td><td>ether3</td></tr>
+            <tr><td>bridge1</td><td>20</td><td>ether2</td><td>ether4</td></tr>
+            <tr><td>bridge1</td><td>30</td><td>ether2</td><td>wlan1</td></tr>
+          </table>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin:8px 0 4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">INTERFACES VLAN</div>
+          <table class="wbt">
+            <tr><th>Interface</th><th>VLAN ID</th><th>Interface pai</th><th>IP</th><th>Uso</th></tr>
+            <tr><td>vlan10</td><td>10</td><td>bridge1</td><td>10.10.10.1/24</td><td>Funcionarios</td></tr>
+            <tr><td>vlan20</td><td>20</td><td>bridge1</td><td>10.20.20.1/24</td><td>Cameras / IoT</td></tr>
+            <tr><td>vlan30</td><td>30</td><td>bridge1</td><td>10.30.30.1/24</td><td>Wi-Fi visitante</td></tr>
+          </table>
+          <div class="wb2" style="margin-top:8px;">⚠️ Lembre de ativar <code>vlan-filtering=yes</code> na bridge e criar DHCP Server para cada VLAN!</div>
+        </div>
+      </div>
+
+      <!-- WIRELESS -->
+      <div class="pnl" id="pnl-wifi">
+        <div class="ph">📡 Wireless — Wi-Fi</div>
+        <div class="pc">
+          <div class="lb"><h4>📘 CONFIGURACAO WIRELESS</h4>Modo <code>ap-bridge</code> para ponto de acesso. Sempre use <code>wpa2-psk</code> ou superior. Para redes separadas crie <code>virtual-ap</code> (SSIDs adicionais) e coloque cada um numa VLAN diferente.<br><br><code>/interface wireless add name=wlan1-vap1 master-interface=wlan1 ssid=Visitantes security-profile=visit-sec</code></div>
+          <table class="wbt">
+            <tr><th>Interface</th><th>SSID</th><th>Banda</th><th>Canal</th><th>Seguranca</th><th>Clientes</th></tr>
+            <tr class="sel"><td>wlan1</td><td>Empresa-Corp</td><td>2GHz-n</td><td>6 (2437MHz)</td><td><span class="bk bok">wpa2-psk</span></td><td>5</td></tr>
+            <tr><td>wlan1-vap1</td><td>Visitantes</td><td>2GHz-n</td><td>6 (2437MHz)</td><td><span class="bk bok">wpa2-psk</span></td><td>2</td></tr>
+            <tr><td>wlan1-vap2</td><td>IoT-Cameras</td><td>2GHz-n</td><td>6 (2437MHz)</td><td><span class="bk bok">wpa2-psk</span></td><td>8</td></tr>
+          </table>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin:8px 0 4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">CLIENTES ATIVOS</div>
+          <table class="wbt">
+            <tr><th>MAC</th><th>SSID</th><th>Signal</th><th>TX Rate</th><th>Uptime</th></tr>
+            <tr><td>AA:BB:CC:11:22:33</td><td>Empresa-Corp</td><td>-52 dBm</td><td>72 Mbps</td><td>02:14:33</td></tr>
+            <tr><td>AA:BB:CC:44:55:66</td><td>Visitantes</td><td>-68 dBm</td><td>54 Mbps</td><td>00:32:11</td></tr>
+          </table>
+          <div class="wb2" style="margin-top:8px;">⚠️ Nunca use <code>WEP</code> ou <code>WPA</code> sem o 2 — possuem vulnerabilidades conhecidas e podem ser quebrados em minutos!</div>
+        </div>
+      </div>
+
+      <!-- PPPOE -->
+      <div class="pnl" id="pnl-pppoe">
+        <div class="ph">🔗 PPPoE — Cliente e Servidor</div>
+        <div class="pc">
+          <div class="lb"><h4>📘 PPPOE NO BRASIL</h4>PPPoE e o protocolo de autenticacao usado pela maioria dos provedores brasileiros. O router cria uma conexao virtual usando login/senha do provedor. O IP publico e recebido dinamicamente.<br><br><code>/interface pppoe-client add name=pppoe-out1 interface=ether1 user=login@isp password=senha add-default-route=yes use-peer-dns=yes</code></div>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin-bottom:4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">PPPOE CLIENT</div>
+          <table class="wbt">
+            <tr><th>Nome</th><th>Interface</th><th>Usuario</th><th>IP recebido</th><th>Uptime</th><th>Status</th></tr>
+            <tr class="sel"><td>pppoe-out1</td><td>ether1</td><td>cliente@isp.com.br</td><td>177.x.x.x (dyn)</td><td>1d 4:22:11</td><td><span class="bk bok">connected</span></td></tr>
+          </table>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin:8px 0 4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">PPPOE SERVER + PPP PROFILES</div>
+          <table class="wbt">
+            <tr><th>Profile</th><th>Local Address</th><th>Remote Pool</th><th>Rate Limit</th></tr>
+            <tr><td>plano-50M</td><td>10.0.0.1</td><td>pool-clientes</td><td>50M/50M</td></tr>
+            <tr><td>plano-100M</td><td>10.0.0.1</td><td>pool-clientes</td><td>100M/100M</td></tr>
+          </table>
+          <div class="wb2" style="margin-top:8px;">⚠️ Sempre use <code>add-default-route=yes</code> e <code>use-peer-dns=yes</code> no cliente PPPoE!</div>
+        </div>
+      </div>
+
+      <!-- DHCP -->
+      <div class="pnl" id="pnl-dhcp">
+        <div class="ph">📋 IP → DHCP Server</div>
+        <div class="pc">
+          <div class="lb"><h4>📘 DHCP SERVER</h4>O DHCP distribui IPs automaticamente. Cada VLAN/segmento precisa do seu proprio DHCP. Configure pool, gateway e DNS.<br><br><code>/ip pool add name=pool-vlan10 ranges=10.10.10.10-10.10.10.254</code><br><code>/ip dhcp-server add name=dhcp-vlan10 interface=vlan10 address-pool=pool-vlan10</code><br><code>/ip dhcp-server network add address=10.10.10.0/24 gateway=10.10.10.1 dns-server=8.8.8.8,1.1.1.1</code></div>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin-bottom:4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">DHCP SERVERS</div>
+          <table class="wbt">
+            <tr><th>Nome</th><th>Interface</th><th>Pool</th><th>Lease Time</th><th>Status</th></tr>
+            <tr class="sel"><td>dhcp1</td><td>bridge1</td><td>pool-lan</td><td>1d</td><td><span class="bk bok">active</span></td></tr>
+            <tr><td>dhcp-vlan10</td><td>vlan10</td><td>pool-vlan10</td><td>8h</td><td><span class="bk bok">active</span></td></tr>
+            <tr><td>dhcp-vlan30</td><td>vlan30</td><td>pool-visit</td><td>1h</td><td><span class="bk bok">active</span></td></tr>
+          </table>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin:8px 0 4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">LEASES ATIVOS</div>
+          <table class="wbt">
+            <tr><th>IP</th><th>MAC</th><th>Hostname</th><th>Tipo</th></tr>
+            <tr><td>192.168.88.10</td><td>AA:BB:11:22:33:44</td><td>notebook-ti</td><td>dynamic</td></tr>
+            <tr><td>192.168.88.50</td><td>AA:BB:55:66:77:88</td><td>servidor-files</td><td><span class="bk bok">static</span></td></tr>
+            <tr><td>10.10.10.11</td><td>AA:BB:99:AA:BB:CC</td><td>pc-recepcao</td><td>dynamic</td></tr>
+          </table>
+          <div class="tb2" style="margin-top:8px;">💡 Para IP fixo: selecione um lease dinamico e clique em <strong>Make Static</strong></div>
+        </div>
+      </div>
+
+      <!-- FIREWALL -->
+      <div class="pnl" id="pnl-fw">
+        <div class="ph">🛡️ Firewall / NAT</div>
+        <div class="pc">
+          <div class="lb"><h4>📘 FIREWALL MIKROTIK</h4>Chains: <code>input</code> (para o router), <code>forward</code> (passando pelo router), <code>output</code> (saindo do router). Regras processadas em ordem — primeira que casar ganha. Boa pratica: aceitar o estabelecido, bloquear o resto.</div>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin-bottom:4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">FILTER RULES</div>
+          <table class="wbt">
+            <tr><th>#</th><th>Chain</th><th>Src Address</th><th>Proto</th><th>Dst Port</th><th>Action</th><th>Comentario</th></tr>
+            <tr><td>0</td><td>input</td><td>any</td><td>icmp</td><td>—</td><td><span class="bk bok">accept</span></td><td style="color:#3a3a5a;">ping ok</td></tr>
+            <tr><td>1</td><td>input</td><td>192.168.88.0/24</td><td>tcp</td><td>22,8291</td><td><span class="bk bok">accept</span></td><td style="color:#3a3a5a;">SSH/Winbox LAN</td></tr>
+            <tr><td>2</td><td>input</td><td>any</td><td>tcp</td><td>22,8291</td><td><span class="bk ber">drop</span></td><td style="color:#3a3a5a;">bloqueia WAN</td></tr>
+            <tr class="sel"><td>3</td><td>forward</td><td>established</td><td>any</td><td>—</td><td><span class="bk bok">accept</span></td><td style="color:#3a3a5a;">conexoes ativas</td></tr>
+            <tr><td>4</td><td>forward</td><td>10.30.30.0/24</td><td>any</td><td>—</td><td><span class="bk ber">drop</span></td><td style="color:#3a3a5a;">visitante sem LAN</td></tr>
+            <tr><td>5</td><td>forward</td><td>invalid</td><td>any</td><td>—</td><td><span class="bk ber">drop</span></td><td style="color:#3a3a5a;">invalidos</td></tr>
+          </table>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin:8px 0 4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">NAT RULES</div>
+          <table class="wbt">
+            <tr><th>#</th><th>Chain</th><th>Src Address</th><th>Out Interface</th><th>Action</th></tr>
+            <tr class="sel"><td>0</td><td>srcnat</td><td>192.168.88.0/24</td><td>pppoe-out1</td><td><span class="bk bok">masquerade</span></td></tr>
+            <tr><td>1</td><td>dstnat</td><td>177.x.x.x:8080</td><td>—</td><td><span class="bk bbl">dst-nat → 192.168.88.50:80</span></td></tr>
+          </table>
+          <div class="lb" style="margin-top:8px;"><h4>💡 NAT MASQUERADE</h4><code>/ip firewall nat add chain=srcnat out-interface=pppoe-out1 action=masquerade</code><br>Traduz IPs privados da LAN para o IP publico da conexao PPPoE.</div>
+        </div>
+      </div>
+
+      <!-- VPN -->
+      <div class="pnl" id="pnl-vpn">
+        <div class="ph">🔐 VPN — L2TP/IPSec</div>
+        <div class="pc">
+          <div class="lb"><h4>📘 VPN L2TP/IPSEC NO MIKROTIK</h4>Permite acesso remoto seguro a rede interna. L2TP cria o tunel, IPSec criptografa. Muito usado para home office e acesso remoto de tecnicos.<br><br>Fluxo: <code>cliente remoto</code> → <code>internet</code> → <code>MikroTik (L2TP server)</code> → <code>rede interna</code></div>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin-bottom:4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">L2TP SERVER</div>
+          <table class="wbt">
+            <tr><th>Status</th><th>Default Profile</th><th>Autenticacao</th><th>Max Sessions</th></tr>
+            <tr class="sel"><td><span class="bk bok">enabled</span></td><td>vpn-profile</td><td>mschap2</td><td>100</td></tr>
+          </table>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin:8px 0 4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">IPSEC — CRIPTOGRAFIA</div>
+          <table class="wbt">
+            <tr><th>Profile</th><th>Enc. Algorithm</th><th>Auth</th><th>DH Group</th></tr>
+            <tr><td>ipsec-vpn</td><td>aes-256</td><td>sha256</td><td>modp2048</td></tr>
+          </table>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin:8px 0 4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">SESSOES ATIVAS</div>
+          <table class="wbt">
+            <tr><th>Nome</th><th>Usuario</th><th>IP local</th><th>IP remoto</th><th>Uptime</th></tr>
+            <tr><td>l2tp-vpn1</td><td>tecnico01</td><td>10.1.1.1</td><td>10.1.1.2</td><td>00:22:14</td></tr>
+          </table>
+          <div class="lb" style="margin-top:8px;"><h4>💡 HABILITAR L2TP SERVER</h4><code>/interface l2tp-server server set enabled=yes use-ipsec=required ipsec-secret=ChaveSecreta123</code><br><br><h4>💡 CRIAR USUARIO VPN</h4><code>/ppp secret add name=tecnico01 password=SenhaVPN service=l2tp local-address=10.1.1.1 remote-address=10.1.1.2</code></div>
+          <div class="wb2">⚠️ Use uma <code>ipsec-secret</code> forte (pre-shared key). Nunca use senhas fracas em VPN — e a porta de entrada da sua rede!</div>
+        </div>
+      </div>
+
+      <!-- QoS -->
+      <div class="pnl" id="pnl-qos">
+        <div class="ph">⚡ QoS — Filas e Controle de Banda</div>
+        <div class="pc">
+          <div class="lb"><h4>📘 QoS NO MIKROTIK</h4><code>Simple Queue</code> e simples e rapido para limitar por IP. <code>Queue Tree</code> e mais avancado com PCQ (Per Connection Queue) para distribuir banda igualmente entre todos os usuarios.<br><br><code>/queue simple add name=cliente1 target=192.168.88.10 max-limit=10M/20M</code><br><code>/queue type add name=pcq-down kind=pcq pcq-classifier=dst-address</code></div>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin-bottom:4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">SIMPLE QUEUES</div>
+          <table class="wbt">
+            <tr><th>Nome</th><th>Target</th><th>Max Limit (Up/Down)</th><th>Burst</th><th>Uso atual</th></tr>
+            <tr class="sel"><td>cliente-joao</td><td>192.168.88.10</td><td>10M / 20M</td><td>30M/1s</td><td><span class="bk bok">4.2M / 11.3M</span></td></tr>
+            <tr><td>cliente-maria</td><td>192.168.88.11</td><td>5M / 10M</td><td>15M/1s</td><td><span class="bk bwn">4.9M / 9.8M</span></td></tr>
+            <tr><td>vlan30-visit</td><td>10.30.30.0/24</td><td>2M / 5M</td><td>—</td><td><span class="bk bok">0.3M / 1.1M</span></td></tr>
+          </table>
+          <div style="color:#4a4a7a;font-size:9px;padding:3px 8px;background:#0d0d1a;border:1px solid var(--border);margin:8px 0 4px;letter-spacing:2px;font-family:'Share Tech Mono',monospace;">QUEUE TREE — PCQ AVANCADO</div>
+          <table class="wbt">
+            <tr><th>Nome</th><th>Parent</th><th>Max Limit</th><th>Queue Type</th></tr>
+            <tr><td>upload-total</td><td>global</td><td>50M</td><td>pcq-upload</td></tr>
+            <tr><td>download-total</td><td>global</td><td>100M</td><td>pcq-download</td></tr>
+          </table>
+          <div class="tb2" style="margin-top:8px;">💡 Burst permite que o usuario use mais banda por tempo curto — otima para carregar paginas rapidamente sem comprometer outros usuarios!</div>
+        </div>
+      </div>
+
+      <!-- SEGURANCA -->
+      <div class="pnl" id="pnl-sec">
+        <div class="ph">🔒 Seguranca — Hardening MikroTik</div>
+        <div class="pc">
+          <div class="lb"><h4>1. TROQUE A SENHA DO ADMIN IMEDIATAMENTE</h4><code>/user set admin password=SenhaForte@2024!</code></div>
+          <div class="lb"><h4>2. CRIE USUARIO DEDICADO E DESATIVE ADMIN</h4><code>/user add name=gerente group=full password=OutraSenha@123</code><br><code>/user disable admin</code></div>
+          <div class="lb"><h4>3. DESATIVE SERVICOS DESNECESSARIOS</h4><code>/ip service disable telnet,ftp,www,api,api-ssl</code><br>Mantenha apenas <code>ssh</code> (porta 22) e <code>winbox</code> (porta 8291)</div>
+          <div class="lb"><h4>4. RESTRINJA ACESSO POR IP DE ORIGEM</h4><code>/ip service set winbox address=192.168.88.0/24</code><br><code>/ip service set ssh address=192.168.88.0/24</code></div>
+          <div class="lb"><h4>5. DESATIVE NEIGHBOR DISCOVERY NA WAN</h4><code>/ip neighbor discovery-settings set discover-interface-list=LAN</code></div>
+          <div class="lb"><h4>6. DESATIVE BANDWIDTH TEST E PROXY</h4><code>/tool bandwidth-server set enabled=no</code><br><code>/ip proxy set enabled=no</code></div>
+          <div class="lb"><h4>7. MANTENHA ROUTEROS ATUALIZADO</h4><code>/system package update check-for-updates</code><br><code>/system package update install</code></div>
+          <div class="lb"><h4>8. CONFIGURE NTP PARA LOGS PRECISOS</h4><code>/system ntp client set enabled=yes servers=pool.ntp.org</code></div>
+          <div class="lb"><h4>9. EXPORTE BACKUP REGULARMENTE</h4><code>/export file=backup-config</code><br><code>/system backup save name=backup-completo</code></div>
+          <div class="wb2">⚠️ <strong>Regra de ouro:</strong> NUNCA deixe Winbox ou SSH acessivel pela internet (WAN)!</div>
+        </div>
+      </div>
+
+      <!-- TERMINAL -->
+      <div class="pnl" id="pnl-term">
+        <div class="ph">💻 Terminal — RouterOS CLI Interativo</div>
+        <div class="term" id="term-out"></div>
+        <div class="ti-row">
+          <span style="color:#4a8fff;font-size:11px;margin-right:8px;white-space:nowrap;">[admin@MikroTik] ></span>
+          <input class="ti" id="term-in" placeholder="Digite um comando RouterOS..." autocomplete="off" onkeydown="termKey(event)">
+          <button class="btn-p" style="margin-left:6px;" onclick="termExec()">↵</button>
+        </div>
+        <div class="ti-hints">
+          interface print | ip address print | ip route print | ip dhcp-server print | ip dhcp-server lease print | ip firewall filter print | ip firewall nat print | queue simple print | interface vlan print | interface bridge print | interface wireless print | interface l2tp-server print | system resource print | system identity print | ping 8.8.8.8 | help | clear
+        </div>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="pnl" id="pnl-quiz">
+        <div class="ph">🎯 Quiz PRO — 12 Perguntas</div>
+        <div class="pc">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <div style="background:rgba(74,111,255,0.1);border:1px solid rgba(74,111,255,0.3);padding:4px 12px;font-size:11px;color:#8888ff;font-family:'Share Tech Mono',monospace;white-space:nowrap;">Score: <span id="qs">0</span>/12</div>
+            <div class="pb" style="flex:1;"><div class="pf" id="qp" style="width:0%"></div></div>
+            <button class="btn-p" onclick="resetQuiz()">↺ Reiniciar</button>
+          </div>
+          <div id="qbox"></div>
+        </div>
+      </div>
+
+    </div><!-- /wb-cnt -->
+  </div><!-- /wb-layout -->
+
+  <!-- STATUS BAR -->
+  <div class="stbar">
+    <span style="color:#00cc66;">● 192.168.88.1</span>
+    <span>admin</span>
+    <span id="stmsg">Pronto</span>
+    <span style="margin-left:auto;color:#2a2a4a;">MikroTik Lab PRO v2.0</span>
+  </div>
+
+</div><!-- /wb -->
+</div><!-- /wb-shell -->
+
+<div class="footer">
+  MikroTik Lab PRO — Simulador Educacional &nbsp;|&nbsp;
+  Desenvolvido para fins educacionais &nbsp;|&nbsp;
+  RouterOS e marca registrada da <a href="https://mikrotik.com" target="_blank">MikroTik</a>
+</div>
+
+<script>
+// ── NAVIGATION ──
+function sp(id) {
+  document.querySelectorAll('.pnl').forEach(p => p.classList.remove('act'));
+  var p = document.getElementById('pnl-' + id);
+  if (p) p.classList.add('act');
+  setSt('Modulo: ' + id);
+}
+function setTb(el) {
+  document.querySelectorAll('.tbb').forEach(b => b.classList.remove('act'));
+  el.classList.add('act');
+}
+function setNi(el) {
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('act'));
+  el.classList.add('act');
+}
+function setSt(m) { document.getElementById('stmsg').textContent = m; }
+
+// ── TERMINAL ──
+var termHistory = [], termHistIdx = -1;
+
+var termCmds = {
+  'help': () => [
+    {t:'inf', m:'Comandos disponiveis:'},
+    {t:'cm',  m:'  interface print                — lista interfaces'},
+    {t:'cm',  m:'  ip address print               — lista enderecos IP'},
+    {t:'cm',  m:'  ip route print                 — tabela de rotas'},
+    {t:'cm',  m:'  ip dhcp-server print           — servidores DHCP'},
+    {t:'cm',  m:'  ip dhcp-server lease print     — leases ativos'},
+    {t:'cm',  m:'  ip firewall filter print       — regras de firewall'},
+    {t:'cm',  m:'  ip firewall nat print          — regras NAT'},
+    {t:'cm',  m:'  queue simple print             — filas simples'},
+    {t:'cm',  m:'  interface vlan print           — interfaces VLAN'},
+    {t:'cm',  m:'  interface bridge print         — bridges'},
+    {t:'cm',  m:'  interface wireless print       — wireless'},
+    {t:'cm',  m:'  interface l2tp-server print    — VPN L2TP server'},
+    {t:'cm',  m:'  system resource print          — recursos do sistema'},
+    {t:'cm',  m:'  system identity print          — identidade do router'},
+    {t:'cm',  m:'  ping 8.8.8.8                  — teste de conectividade'},
+    {t:'cm',  m:'  clear                          — limpar terminal'},
+  ],
+  'clear': () => { document.getElementById('term-out').innerHTML = ''; return []; },
+  'interface print': () => [
+    {t:'inf', m:'Flags: D-dynamic, X-disabled, R-running, S-slave'},
+    {t:'cm',  m:' #   NAME           TYPE       MTU    STATUS'},
+    {t:'ok',  m:' 0 R ether1         ether      1500   running'},
+    {t:'ok',  m:' 1 R ether2         ether      1500   running'},
+    {t:'cm',  m:' 2   ether3         ether      1500   no-link'},
+    {t:'cm',  m:' 3   ether4         ether      1500   no-link'},
+    {t:'cm',  m:' 4   ether5-sfp     ether      1500   no-link'},
+    {t:'ok',  m:' 5 R wlan1          wlan       1500   running'},
+    {t:'ok',  m:' 6 R bridge1        bridge     1500   running'},
+    {t:'ok',  m:' 7 R pppoe-out1     pppoe-out  1480   running'},
+    {t:'ok',  m:' 8 R vlan10         vlan       1500   running'},
+    {t:'cm',  m:' 9   l2tp-vpn1      l2tp-in    1500   waiting'},
+  ],
+  'ip address print': () => [
+    {t:'inf', m:'Flags: X-disabled, I-invalid, D-dynamic'},
+    {t:'cm',  m:' #   ADDRESS             NETWORK         INTERFACE'},
+    {t:'ok',  m:' 0   192.168.88.1/24    192.168.88.0    bridge1'},
+    {t:'ok',  m:' 1   10.10.10.1/24      10.10.10.0      vlan10'},
+    {t:'ok',  m:' 2   10.20.20.1/24      10.20.20.0      vlan20'},
+    {t:'ok',  m:' 3   10.30.30.1/24      10.30.30.0      vlan30'},
+    {t:'ok',  m:' 4 D 177.55.123.45/32   dynamic         pppoe-out1'},
+  ],
+  'ip route print': () => [
+    {t:'inf', m:'Flags: X-disabled, A-active, D-dynamic, C-connect, S-static'},
+    {t:'cm',  m:' #    DST-ADDRESS        GATEWAY           DISTANCE'},
+    {t:'ok',  m:' 0 AS 0.0.0.0/0         pppoe-out1        0'},
+    {t:'ok',  m:' 1 AC 192.168.88.0/24   bridge1           0'},
+    {t:'ok',  m:' 2 AC 10.10.10.0/24     vlan10            0'},
+    {t:'ok',  m:' 3 AC 10.30.30.0/24     vlan30            0'},
+  ],
+  'ip dhcp-server print': () => [
+    {t:'cm',  m:' #   NAME          INTERFACE   LEASE-TIME  ADDR-POOL      STATUS'},
+    {t:'ok',  m:' 0   dhcp1         bridge1     1d          pool-lan       active'},
+    {t:'ok',  m:' 1   dhcp-vlan10   vlan10      8h          pool-vlan10    active'},
+    {t:'ok',  m:' 2   dhcp-vlan30   vlan30      1h          pool-visit     active'},
+  ],
+  'ip dhcp-server lease print': () => [
+    {t:'cm',  m:' #   ADDRESS          MAC                HOSTNAME        STATUS'},
+    {t:'ok',  m:' 0   192.168.88.10    AA:BB:11:22:33:44  notebook-ti     bound'},
+    {t:'ok',  m:' 1   192.168.88.50    AA:BB:55:66:77:88  servidor-files  static'},
+    {t:'ok',  m:' 2   10.10.10.11      AA:BB:99:AA:BB:CC  pc-recepcao     bound'},
+  ],
+  'ip firewall filter print': () => [
+    {t:'inf', m:'Flags: X-disabled, I-invalid, D-dynamic'},
+    {t:'cm',  m:' # CHAIN    SRC-ADDRESS        PROTO  DST-PORT  ACTION'},
+    {t:'ok',  m:' 0 input                       icmp             accept'},
+    {t:'ok',  m:' 1 input    192.168.88.0/24    tcp    22,8291   accept'},
+    {t:'er',  m:' 2 input                       tcp    22,8291   drop'},
+    {t:'ok',  m:' 3 forward  established                         accept'},
+    {t:'er',  m:' 4 forward  10.30.30.0/24                       drop'},
+    {t:'er',  m:' 5 forward  invalid                             drop'},
+  ],
+  'ip firewall nat print': () => [
+    {t:'cm',  m:' # CHAIN   SRC-ADDRESS        OUT-IFACE     ACTION'},
+    {t:'ok',  m:' 0 srcnat  192.168.88.0/24    pppoe-out1    masquerade'},
+    {t:'ok',  m:' 1 dstnat  177.55.123.45      bridge1       dst-nat→192.168.88.50:80'},
+  ],
+  'queue simple print': () => [
+    {t:'cm',  m:' # NAME           TARGET            MAX-LIMIT(UP/DOWN)  BURST'},
+    {t:'ok',  m:' 0 cliente-joao   192.168.88.10     10M/20M             30M/1s'},
+    {t:'ok',  m:' 1 cliente-maria  192.168.88.11     5M/10M              15M/1s'},
+    {t:'ok',  m:' 2 vlan30-visit   10.30.30.0/24     2M/5M               -'},
+  ],
+  'interface vlan print': () => [
+    {t:'cm',  m:' # NAME    VLAN-ID  INTERFACE  STATUS'},
+    {t:'ok',  m:' 0 vlan10  10       bridge1    running'},
+    {t:'ok',  m:' 1 vlan20  20       bridge1    running'},
+    {t:'ok',  m:' 2 vlan30  30       bridge1    running'},
+  ],
+  'interface bridge print': () => [
+    {t:'cm',  m:' # NAME     MTU   STP  VLAN-FILTER  STATUS'},
+    {t:'ok',  m:' 0 bridge1  1500  no   yes          running'},
+  ],
+  'interface wireless print': () => [
+    {t:'cm',  m:' # NAME       SSID           BAND    FREQ     SECURITY   CLIENTS'},
+    {t:'ok',  m:' 0 wlan1      Empresa-Corp   2GHz-n  2437MHz  wpa2-psk   5'},
+    {t:'ok',  m:' 1 wlan1-v1   Visitantes     2GHz-n  2437MHz  wpa2-psk   2'},
+    {t:'ok',  m:' 2 wlan1-v2   IoT-Cameras    2GHz-n  2437MHz  wpa2-psk   8'},
+  ],
+  'interface l2tp-server print': () => [
+    {t:'cm',  m:' ENABLED  DEFAULT-PROFILE  MAX-SESSIONS  USE-IPSEC'},
+    {t:'ok',  m:' yes      vpn-profile      100           required'},
+  ],
+  'system resource print': () => [
+    {t:'ok',  m:'       uptime: 5d 8h 22m 14s'},
+    {t:'ok',  m:'      version: 7.14.2 (stable)'},
+    {t:'ok',  m:'   board-name: RouterBOARD 760iGS'},
+    {t:'ok',  m:' architecture: mipsbe'},
+    {t:'ok',  m:'     cpu-load: 18 %'},
+    {t:'ok',  m:'  free-memory: 45.2MiB / 64MiB'},
+    {t:'ok',  m:'free-hdd-space: 7.2MiB / 16MiB'},
+  ],
+  'system identity print': () => [
+    {t:'ok',  m:' name: MikroTik-Lab'},
+  ],
+  'ping 8.8.8.8': () => [
+    {t:'inf', m:'  HOST=8.8.8.8 (Google DNS)'},
+    {t:'ok',  m:'  64 bytes from 8.8.8.8: seq=0 ttl=117 time=12ms'},
+    {t:'ok',  m:'  64 bytes from 8.8.8.8: seq=1 ttl=117 time=11ms'},
+    {t:'ok',  m:'  64 bytes from 8.8.8.8: seq=2 ttl=117 time=13ms'},
+    {t:'ok',  m:'  3 packets sent, 3 received, 0% packet loss'},
+    {t:'ok',  m:'  avg rtt = 12ms'},
+  ],
+};
+
+function escH(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function termPrint(lines) {
+  var out = document.getElementById('term-out');
+  lines.forEach(l => {
+    var d = document.createElement('div');
+    d.className = l.t;
+    d.textContent = l.m;
+    out.appendChild(d);
+  });
+  out.scrollTop = out.scrollHeight;
+}
+
+function termExec() {
+  var inp = document.getElementById('term-in');
+  var cmd = inp.value.trim();
+  if (!cmd) return;
+  termHistory.unshift(cmd);
+  termHistIdx = -1;
+  var out = document.getElementById('term-out');
+  var pr = document.createElement('div');
+  pr.innerHTML = '<span class="pr">[admin@MikroTik] > </span><span style="color:#fff;">' + escH(cmd) + '</span>';
+  out.appendChild(pr);
+  var key = cmd.toLowerCase().replace(/^\//, '');
+  var fn = termCmds[key];
+  if (fn) {
+    termPrint(fn());
+  } else if (cmd.startsWith('/')) {
+    termPrint([{t:'inf', m:'  Dica: no terminal do Lab omita a barra. Ex: "interface print" em vez de "/interface print"'}]);
+  } else {
+    termPrint([
+      {t:'er',  m:'  bad command name "' + cmd + '"'},
+      {t:'inf', m:'  Digite "help" para ver os comandos disponíveis'},
+    ]);
+  }
+  inp.value = '';
+  setSt('CMD: ' + cmd);
+}
+
+function termKey(e) {
+  var inp = document.getElementById('term-in');
+  if (e.key === 'Enter') { termExec(); }
+  else if (e.key === 'ArrowUp') {
+    termHistIdx = Math.min(termHistIdx + 1, termHistory.length - 1);
+    if (termHistory[termHistIdx] !== undefined) inp.value = termHistory[termHistIdx];
+    e.preventDefault();
+  } else if (e.key === 'ArrowDown') {
+    termHistIdx = Math.max(termHistIdx - 1, -1);
+    inp.value = termHistIdx >= 0 ? termHistory[termHistIdx] : '';
+    e.preventDefault();
+  }
+}
+
+// ── QUIZ ──
+var quizData = [
+  {q:"Qual comando cria uma bridge no MikroTik?", opts:["/interface bridge add name=bridge1","  /ip bridge create bridge1","  /bridge new name=bridge1","  /interface add type=bridge"], c:0, e:"O comando correto e /interface bridge add name=bridge1"},
+  {q:"O que faz 'add-default-route=yes' no PPPoE Client?", opts:["Cria rota para a LAN","Define a rota padrao de saida para internet","Adiciona DNS automatico","Cria NAT automatico"], c:1, e:"Sem isso o router nao sabe sair para internet pelo PPPoE."},
+  {q:"Qual VLAN ID determina que uma porta e trunk?", opts:["VLAN 1 (default)","Depende da config — qualquer ID pode ser trunk","VLAN 4094","VLAN 100"], c:1, e:"Qualquer VLAN pode ser tagged (trunk). O ID nao determina — a configuracao da porta sim."},
+  {q:"O que e masquerade no NAT?", opts:["Bloqueia trafego externo","Traduz IPs privados para o IP publico dinamico","Cria tunel VPN","Filtra pacotes por porta"], c:1, e:"Masquerade e srcnat dinamico — usa o IP atual da interface de saida, ideal para PPPoE."},
+  {q:"Qual protocolo criptografa o tunel L2TP no MikroTik?", opts:["SSL/TLS","WPA2","IPSec","OpenVPN"], c:2, e:"L2TP cria o tunel, IPSec criptografa. Juntos formam L2TP/IPSec."},
+  {q:"O que e Simple Queue no QoS MikroTik?", opts:["Regra de firewall","Controle de banda por IP ou sub-rede","Servidor DHCP prioritario","Tabela de rotas avancada"], c:1, e:"Simple Queue limita upload e download por alvo (IP, rede, interface)."},
+  {q:"Por seguranca, qual servico NUNCA deve ficar ativo?", opts:["SSH","Winbox","Telnet (porta 23)","NTP"], c:2, e:"Telnet transmite tudo sem criptografia, incluindo senhas. Sempre desative!"},
+  {q:"Qual e o objetivo do VLAN Filter na bridge MikroTik?", opts:["Filtrar MAC addresses","Habilitar segmentacao por VLAN nas portas da bridge","Bloquear broadcast","Limitar velocidade por VLAN"], c:1, e:"Com vlan-filtering=yes, as portas da bridge passam a respeitar as regras de VLAN."},
+  {q:"O que e PCQ (Per Connection Queue)?", opts:["Fila que prioriza VoIP","Distribui banda igualmente entre conexoes/usuarios","Limita uma unica conexao","Comprime pacotes TCP"], c:1, e:"PCQ divide a banda disponivel igualmente — nenhum usuario monopoliza a conexao."},
+  {q:"Como criar um IP fixo para um cliente no DHCP?", opts:["Editar o pool de IPs","Selecionar o lease dinamico e fazer Make Static","Adicionar no ip address","Criar rota estatica"], c:1, e:"No Winbox: selecione o lease dinamico e clique em Make Static para fixar o IP ao MAC."},
+  {q:"Qual comando exporta a configuracao completa do MikroTik?", opts:["/system save","/export file=meu-backup","/config export","/backup save"], c:1, e:"/export file=nome gera arquivo .rsc com todos os comandos de configuracao."},
+  {q:"Para isolar visitantes da rede corporativa, o correto e:", opts:["Usar senha diferente no Wi-Fi","VLAN separada + regra firewall drop entre VLANs","Desligar o Wi-Fi corporativo","Usar MAC filtering"], c:1, e:"VLAN separada + regra forward drop entre VLANs e a forma correta e segura."},
+];
+
+var qScore = 0, qAns = 0;
+
+function renderQuiz() {
+  var h = '';
+  quizData.forEach((q, i) => {
+    h += '<div class="qb" id="qq' + i + '">';
+    h += '<h4>' + (i+1) + '. ' + q.q + '</h4>';
+    q.opts.forEach((o, j) => {
+      h += '<button class="qo" id="qo' + i + '-' + j + '" onclick="ansQ(' + i + ',' + j + ')">' + o.trim() + '</button>';
+    });
+    h += '<div id="qe' + i + '" style="display:none;color:#66aa66;font-size:11px;margin-top:6px;padding:5px 8px;background:rgba(0,120,60,0.08);border:1px solid rgba(0,180,80,0.2);font-family:Rajdhani,sans-serif;"></div>';
+    h += '</div>';
+  });
+  document.getElementById('qbox').innerHTML = h;
+}
+
+function ansQ(qi, oi) {
+  var q = quizData[qi];
+  var box = document.getElementById('qq' + qi);
+  if (box.dataset.done) return;
+  box.dataset.done = '1';
+  qAns++;
+  var ok = q.c === oi;
+  if (ok) {
+    qScore++;
+    document.getElementById('qs').textContent = qScore;
+    document.getElementById('d-score').textContent = qScore;
+  }
+  document.getElementById('d-ans').textContent = qAns;
+  for (var j = 0; j < q.opts.length; j++) {
+    var b = document.getElementById('qo' + qi + '-' + j);
+    b.disabled = true;
+    if (j === q.c) b.classList.add('qok');
+    else if (j === oi && !ok) b.classList.add('qer');
+  }
+  var ep = document.getElementById('qe' + qi);
+  ep.style.display = 'block';
+  ep.textContent = (ok ? '✓ Correto! ' : '✗ Incorreto. ') + q.e;
+  var pct = Math.round((qAns / quizData.length) * 100);
+  document.getElementById('qp').style.width = pct + '%';
+  document.getElementById('d-prog').style.width = pct + '%';
+  setSt(ok ? 'Resposta correta!' : 'Resposta incorreta.');
+}
+
+function resetQuiz() {
+  qScore = 0; qAns = 0;
+  document.getElementById('qs').textContent = '0';
+  document.getElementById('d-score').textContent = '0';
+  document.getElementById('d-ans').textContent = '0';
+  document.getElementById('qp').style.width = '0%';
+  document.getElementById('d-prog').style.width = '0%';
+  renderQuiz();
+  setSt('Quiz reiniciado');
+}
+
+// ── INIT ──
+(function init() {
+  renderQuiz();
+  var out = document.getElementById('term-out');
+  [
+    {t:'inf', m:'MikroTik RouterOS 7.14.2 (c) 1999-2024 MikroTik'},
+    {t:'inf', m:'MikroTik Lab PRO — Simulador Educacional'},
+    {t:'ok',  m:'Login OK: admin @ 192.168.88.1'},
+    {t:'cm',  m:''},
+    {t:'cm',  m:'  Digite "help" para listar todos os comandos.'},
+    {t:'cm',  m:'  Use seta ↑/↓ para historico de comandos.'},
+    {t:'cm',  m:''},
+  ].forEach(l => {
+    var d = document.createElement('div');
+    d.className = l.t; d.textContent = l.m;
+    out.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>
