@@ -2,7 +2,7 @@
 
 > Ambiente interativo estilo **Winbox** para aprender configurações reais de roteadores MikroTik de forma gamificada.
 
-🌐 **Demo ao vivo:** luciano-veiga.github.io/mikrotik-lab/
+🌐 **Demo ao vivo:** [luciano-veiga.github.io/mikrotik-lab/](https://luciano-veiga.github.io/mikrotik-lab/)
 
 ---
 
